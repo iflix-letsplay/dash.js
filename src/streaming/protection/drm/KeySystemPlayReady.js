@@ -81,7 +81,7 @@ function KeySystemPlayReady(config) {
         }
         // some devices (Ex: LG SmartTVs) require content-type to be defined
         if (!headers.hasOwnProperty('Content-Type')) {
-            headers['Content-Type'] = 'text/xml; charset=' + messageFormat;
+            headers['Content-Type'] = 'text/xml';
         }
         return headers;
     }

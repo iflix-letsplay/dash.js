@@ -73,12 +73,12 @@ function ProtectionKeyController() {
 
         let keySystem;
 
-        // Widevine
-        keySystem = KeySystemWidevine(context).getInstance({ BASE64: BASE64 });
-        keySystems.push(keySystem);
-
         // PlayReady
         keySystem = KeySystemPlayReady(context).getInstance({ BASE64: BASE64 });
+        keySystems.push(keySystem);
+
+        // Widevine
+        keySystem = KeySystemWidevine(context).getInstance({ BASE64: BASE64 });
         keySystems.push(keySystem);
 
         // ClearKey
