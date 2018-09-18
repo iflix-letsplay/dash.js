@@ -50,8 +50,8 @@ var data=undefined;if(end === remaining.length){data = remaining;remaining = new
 // when they are based in small amount of data
 httpRequest.progress({data:data.buffer,lengthComputable:false,noTrace:true});offset = 0;}else {offset = boxesInfo.lastCompletedOffset; // Call progress so it generates traces that will be later used to know when the first byte
 // were received
-if(!signaledFirstByte){httpRequest.progress({lengthComputable:false,noTrace:true});signaledFirstByte = true;}}}read(httpRequest,processResult);};read(httpRequest,processResult);})['catch'](function(e){if(httpRequest.onerror){httpRequest.onerror(e);}});}function read(httpRequest,processResult){httpRequest.reader.read().then(processResult)['catch'](function(){ // don't do nothing. Manage this error in fetch method promise
-});}function concatTypedArray(remaining,data){if(remaining.length === 0){return data;}var result=new Uint8Array(remaining.length + data.length);result.set(remaining);result.set(data,remaining.length);return result;}function abort(request){if(request.abortController){ // For firefox and edge
+if(!signaledFirstByte){httpRequest.progress({lengthComputable:false,noTrace:true});signaledFirstByte = true;}}}read(httpRequest,processResult);};read(httpRequest,processResult);})['catch'](function(e){if(httpRequest.onerror){httpRequest.onerror(e);}});}function read(httpRequest,processResult){httpRequest.reader.read().then(processResult)['catch'](function(e){if(httpRequest.onerror && httpRequest.response.status === 200){ // Error, but response code is 200, trigger error
+httpRequest.onerror(e);}});}function concatTypedArray(remaining,data){if(remaining.length === 0){return data;}var result=new Uint8Array(remaining.length + data.length);result.set(remaining);result.set(data,remaining.length);return result;}function abort(request){if(request.abortController){ // For firefox and edge
 request.abortController.abort();}else if(request.reader){ // For Chrome
 try{request.reader.cancel();}catch(e) { // throw exceptions (TypeError) when reader was previously closed,
 // for example, because a network issue

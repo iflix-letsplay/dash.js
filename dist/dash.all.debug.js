@@ -9125,7 +9125,7 @@ function config (name) {
 
                     if (doc !== null) {
 
-                        reportFatal("Two <tt> elements at (" + this.line + "," + this.column + ")");
+                        reportFatal(errorHandler, "Two <tt> elements at (" + this.line + "," + this.column + ")");
 
                     }
 
@@ -9138,7 +9138,7 @@ function config (name) {
                 } else if (node.local === 'head') {
 
                     if (!(estack[0] instanceof TT)) {
-                        reportFatal("Parent of <head> element is not <tt> at (" + this.line + "," + this.column + ")");
+                        reportFatal(errorHandler, "Parent of <head> element is not <tt> at (" + this.line + "," + this.column + ")");
                     }
 
                     if (doc.head !== null) {
@@ -9152,7 +9152,7 @@ function config (name) {
                 } else if (node.local === 'styling') {
 
                     if (!(estack[0] instanceof Head)) {
-                        reportFatal("Parent of <styling> element is not <head> at (" + this.line + "," + this.column + ")");
+                        reportFatal(errorHandler, "Parent of <styling> element is not <head> at (" + this.line + "," + this.column + ")");
                     }
 
                     if (doc.head.styling !== null) {
@@ -9177,7 +9177,7 @@ function config (name) {
 
                         if (!s.id) {
 
-                            reportError("<style> element missing @id attribute");
+                            reportError(errorHandler, "<style> element missing @id attribute");
 
                         } else {
 
@@ -9912,6 +9912,7 @@ function config (name) {
 
     Br.prototype.initFromNode = function (doc, parent, node, errorHandler) {
         LayoutElement.prototype.initFromNode.call(this, doc, parent, node, errorHandler);
+        TimedElement.prototype.initFromNode.call(this, doc, parent, node, errorHandler);
     };
 
     /*
@@ -11817,9 +11818,9 @@ function config (name) {
 
     function isdProcessContentElement(doc, offset, region, body, parent, inherited_region_id, elem, errorHandler, context) {
 
-        /* prune if temporally inactive (<br> are not included in timing) */
+        /* prune if temporally inactive */
 
-        if (elem.kind !== 'br' && (offset < elem.begin || offset >= elem.end)) {
+        if (offset < elem.begin || offset >= elem.end) {
             return null;
         }
 
@@ -12983,9 +12984,16 @@ exports.renderHTML = _dereq_(39).render;
                             out[i] = padding[i].value / doc.cellResolution.h;
 
                         } else if (padding[i].unit === "px") {
+                            
+                            if (i === "0" || i === "2") {
 
-                            out[i] = padding[i].value / doc.pxDimensions.h;
+                                out[i] = padding[i].value / doc.pxDimensions.h;
 
+                            } else {
+
+                                out[i] = padding[i].value / doc.pxDimensions.w;
+                            }
+                            
                         } else {
 
                             return null;
@@ -13364,8 +13372,8 @@ exports.renderHTML = _dereq_(39).render;
      */
 
     var HEX_COLOR_RE = /#([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})?/;
-    var DEC_COLOR_RE = /rgb\((\d+),(\d+),(\d+)\)/;
-    var DEC_COLORA_RE = /rgba\((\d+),(\d+),(\d+),(\d+)\)/;
+    var DEC_COLOR_RE = /rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/;
+    var DEC_COLORA_RE = /rgba\(\s*(\d+),\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/;
     var NAMED_COLOR = {
         transparent: [0, 0, 0, 0],
         black: [0, 0, 0, 255],
@@ -43370,12 +43378,12 @@ function ProtectionKeyController() {
 
         var keySystem = undefined;
 
-        // Widevine
-        keySystem = (0, _drmKeySystemWidevine2['default'])(context).getInstance({ BASE64: BASE64 });
-        keySystems.push(keySystem);
-
         // PlayReady
         keySystem = (0, _drmKeySystemPlayReady2['default'])(context).getInstance({ BASE64: BASE64 });
+        keySystems.push(keySystem);
+
+        // Widevine
+        keySystem = (0, _drmKeySystemWidevine2['default'])(context).getInstance({ BASE64: BASE64 });
         keySystems.push(keySystem);
 
         // ClearKey
@@ -43885,7 +43893,7 @@ function KeySystemPlayReady(config) {
         }
         // some devices (Ex: LG SmartTVs) require content-type to be defined
         if (!headers.hasOwnProperty('Content-Type')) {
-            headers['Content-Type'] = 'text/xml; charset=' + messageFormat;
+            headers['Content-Type'] = 'text/xml';
         }
         return headers;
     }

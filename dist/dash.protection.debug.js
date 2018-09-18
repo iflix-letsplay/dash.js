@@ -1655,12 +1655,12 @@ function ProtectionKeyController() {
 
         var keySystem = undefined;
 
-        // Widevine
-        keySystem = (0, _drmKeySystemWidevine2['default'])(context).getInstance({ BASE64: BASE64 });
-        keySystems.push(keySystem);
-
         // PlayReady
         keySystem = (0, _drmKeySystemPlayReady2['default'])(context).getInstance({ BASE64: BASE64 });
+        keySystems.push(keySystem);
+
+        // Widevine
+        keySystem = (0, _drmKeySystemWidevine2['default'])(context).getInstance({ BASE64: BASE64 });
         keySystems.push(keySystem);
 
         // ClearKey
@@ -2170,7 +2170,7 @@ function KeySystemPlayReady(config) {
         }
         // some devices (Ex: LG SmartTVs) require content-type to be defined
         if (!headers.hasOwnProperty('Content-Type')) {
-            headers['Content-Type'] = 'text/xml; charset=' + messageFormat;
+            headers['Content-Type'] = 'text/xml';
         }
         return headers;
     }
