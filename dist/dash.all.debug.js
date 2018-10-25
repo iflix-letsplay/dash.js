@@ -42656,7 +42656,7 @@ function ProtectionController(config) {
 
         // ContentProtection elements are specified at the AdaptationSet level, so the CP for audio
         // and video will be the same.  Just use one valid MediaInfo object
-        var supportedKS = protectionKeyController.getSupportedKeySystemsFromContentProtection(mediaInfo.contentProtection);
+        var supportedKS = protectionKeyController.getSupportedKeySystemsFromContentProtection(mediaInfo.contentProtection, protDataSet);
         if (supportedKS && supportedKS.length > 0) {
             selectKeySystem(supportedKS, true);
         }
@@ -43482,13 +43482,14 @@ function ProtectionKeyController() {
      *
      * @param {Array.<Object>} cps - array of content protection elements parsed
      * from the manifest
+     * @param {Object} protDataSet - object passed from player configuration
      * @returns {Array.<Object>} array of objects indicating which supported key
      * systems were found.  Empty array is returned if no
      * supported key systems were found
      * @memberof module:ProtectionKeyController
      * @instance
      */
-    function getSupportedKeySystemsFromContentProtection(cps) {
+    function getSupportedKeySystemsFromContentProtection(cps, protDataSet) {
         var cp = undefined,
             ks = undefined,
             ksIdx = undefined,
@@ -43512,6 +43513,27 @@ function ProtectionKeyController() {
                 }
             }
         }
+
+        // If there is keySystem in protDataSet, reorder supported keySystemString
+        // to follow priority property if present in protDataSet configuration.
+        if (protDataSet && Object.keys(protDataSet).length !== 0) {
+            (function () {
+                var getPriority = function getPriority(system) {
+                    if (system) {
+                        // return 1 for keySystems in config
+                        return system.priority || 1;
+                    }
+                    // return 0 for others
+                    return 0;
+                };
+                supportedKS.sort(function (a, b) {
+                    var aP = getPriority(protDataSet[a.ks.systemString]);
+                    var bP = getPriority(protDataSet[b.ks.systemString]);
+                    return aP > bP ? -1 : aP === bP ? 0 : 1;
+                });
+            })();
+        }
+
         return supportedKS;
     }
 

@@ -55,7 +55,7 @@
 // so we create the strictly necessary DRM sessions
 if(!mediaInfo){throw new Error('mediaInfo can not be null or undefined');}checkConfig();eventBus.on(events.INTERNAL_KEY_MESSAGE,onKeyMessage,this);eventBus.on(events.INTERNAL_KEY_STATUS_CHANGED,onKeyStatusChanged,this);mediaInfoArr.push(mediaInfo); // ContentProtection elements are specified at the AdaptationSet level, so the CP for audio
 // and video will be the same.  Just use one valid MediaInfo object
-var supportedKS=protectionKeyController.getSupportedKeySystemsFromContentProtection(mediaInfo.contentProtection);if(supportedKS && supportedKS.length > 0){selectKeySystem(supportedKS,true);}} /**
+var supportedKS=protectionKeyController.getSupportedKeySystemsFromContentProtection(mediaInfo.contentProtection,protDataSet);if(supportedKS && supportedKS.length > 0){selectKeySystem(supportedKS,true);}} /**
      * Returns a set of supported key systems and CENC initialization data
      * from the given array of ContentProtection elements.  Only
      * key systems that are supported by this player will be returned.

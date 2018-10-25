@@ -114,7 +114,7 @@ function ProtectionController(config) {
 
         // ContentProtection elements are specified at the AdaptationSet level, so the CP for audio
         // and video will be the same.  Just use one valid MediaInfo object
-        const supportedKS = protectionKeyController.getSupportedKeySystemsFromContentProtection(mediaInfo.contentProtection);
+        const supportedKS = protectionKeyController.getSupportedKeySystemsFromContentProtection(mediaInfo.contentProtection, protDataSet);
         if (supportedKS && supportedKS.length > 0) {
             selectKeySystem(supportedKS, true);
         }

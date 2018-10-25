@@ -177,13 +177,14 @@ function ProtectionKeyController() {
      *
      * @param {Array.<Object>} cps - array of content protection elements parsed
      * from the manifest
+     * @param {Object} protDataSet - object passed from player configuration
      * @returns {Array.<Object>} array of objects indicating which supported key
      * systems were found.  Empty array is returned if no
      * supported key systems were found
      * @memberof module:ProtectionKeyController
      * @instance
      */
-    function getSupportedKeySystemsFromContentProtection(cps) {
+    function getSupportedKeySystemsFromContentProtection(cps, protDataSet) {
         let cp, ks, ksIdx, cpIdx;
         let supportedKS = [];
 
@@ -204,6 +205,28 @@ function ProtectionKeyController() {
                 }
             }
         }
+
+        // If there is keySystem in protDataSet, reorder supported keySystemString
+        // to follow priority property if present in protDataSet configuration.
+        if (
+            protDataSet &&
+            Object.keys(protDataSet).length !== 0
+        ) {
+            const getPriority = (system) => {
+                if (system) {
+                    // return 1 for keySystems in config
+                    return system.priority || 1;
+                }
+                // return 0 for others
+                return 0;
+            };
+            supportedKS.sort((a, b) => {
+                const aP = getPriority(protDataSet[a.ks.systemString]);
+                const bP = getPriority(protDataSet[b.ks.systemString]);
+                return aP > bP ? -1 : aP === bP ? 0 : 1;
+            });
+        }
+
         return supportedKS;
     }
 

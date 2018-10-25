@@ -83,13 +83,18 @@ keySystem = (0,_drmKeySystemW3CClearKey2['default'])(context).getInstance({BASE6
      *
      * @param {Array.<Object>} cps - array of content protection elements parsed
      * from the manifest
+     * @param {Object} protDataSet - object passed from player configuration
      * @returns {Array.<Object>} array of objects indicating which supported key
      * systems were found.  Empty array is returned if no
      * supported key systems were found
      * @memberof module:ProtectionKeyController
      * @instance
-     */function getSupportedKeySystemsFromContentProtection(cps){var cp=undefined,ks=undefined,ksIdx=undefined,cpIdx=undefined;var supportedKS=[];if(cps){for(ksIdx = 0;ksIdx < keySystems.length;++ksIdx) {ks = keySystems[ksIdx];for(cpIdx = 0;cpIdx < cps.length;++cpIdx) {cp = cps[cpIdx];if(cp.schemeIdUri.toLowerCase() === ks.schemeIdURI){ // Look for DRM-specific ContentProtection
-supportedKS.push({ks:ks,initData:ks.getInitData(cp),cdmData:ks.getCDMData(),sessionId:ks.getSessionId(cp)});}}}}return supportedKS;} /**
+     */function getSupportedKeySystemsFromContentProtection(cps,protDataSet){var cp=undefined,ks=undefined,ksIdx=undefined,cpIdx=undefined;var supportedKS=[];if(cps){for(ksIdx = 0;ksIdx < keySystems.length;++ksIdx) {ks = keySystems[ksIdx];for(cpIdx = 0;cpIdx < cps.length;++cpIdx) {cp = cps[cpIdx];if(cp.schemeIdUri.toLowerCase() === ks.schemeIdURI){ // Look for DRM-specific ContentProtection
+supportedKS.push({ks:ks,initData:ks.getInitData(cp),cdmData:ks.getCDMData(),sessionId:ks.getSessionId(cp)});}}}} // If there is keySystem in protDataSet, reorder supported keySystemString
+// to follow priority property if present in protDataSet configuration.
+if(protDataSet && Object.keys(protDataSet).length !== 0){(function(){var getPriority=function getPriority(system){if(system){ // return 1 for keySystems in config
+return system.priority || 1;} // return 0 for others
+return 0;};supportedKS.sort(function(a,b){var aP=getPriority(protDataSet[a.ks.systemString]);var bP=getPriority(protDataSet[b.ks.systemString]);return aP > bP?-1:aP === bP?0:1;});})();}return supportedKS;} /**
      * Returns key systems supported by this player for the given PSSH
      * initializationData. Only key systems supported by this player
      * that have protection data present will be returned.  Key systems are returned in priority order
